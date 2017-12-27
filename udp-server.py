@@ -52,5 +52,6 @@ while True:
 			output.remove(ships[i])
 	f = open('markers.json','w')
 	f.write(json.dumps(output, indent=4, sort_keys=True))
+# mysql> insert into position (id, mmsi, type, lat, lon, ts, name, aton_type) values (NULL, 992501303, 21, '52.7745', '-5.9517', 1514416112, 'ARKLOW TURBINE 1', 3);
 	f.close()
 #	print json.dumps(output, indent=4, sort_keys=True)

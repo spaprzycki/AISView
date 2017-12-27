@@ -1,4 +1,8 @@
 [network]
 listen = 0.0.0.0
 port = 10110
-
+[db]
+db_host = localhost
+db_user = aisview
+db_pass = aisview
+db_name = aisview

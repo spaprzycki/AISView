@@ -84,9 +84,15 @@ function draw_table() {
     var tbl_body = "";
     for (var i=0; i < markers.length; ++i) {
       var last_seen = getEpoch()-markers[i].ts;
+      if (markers[i].name) {
+        name = markers[i].name.replace(/^\s+|\s+$|@+$/g, "");
+      }
+      else {
+        name = "Unknown";
+      }
       var tbl_row =  '<td>' + resolveAisType(markers[i].msgid) + '</td>'
       + '<td>' + markers[i].mmsi + '</td>'
-      + '<td>' + markers[i].name + '</td>'
+      + '<td>' + name + '</td>'
       + '<td>' + markers[i].sog + '</td>'
       + '<td>' + last_seen + '</td>';
       tbl_body += "<tr>" + tbl_row + "</tr>";
