@@ -1,3 +1,13 @@
+function resolveAisType(id) {
+  var types = { 1 : "Vessel", 4 : "Base station", 21 : "AtoN" };
+  if (id in types) {
+    return types[id];
+  }
+  else {
+    return "Unknown";
+  }
+}
+
 function getEpoch() {
   d = new Date();
   return Math.round(d.getTime() / 1000);
@@ -67,5 +77,32 @@ function update_positions() {
     }
   });
   setTimeout(update_positions, 5000);
+}
+
+function draw_table() {
+  $.getJSON("markers.json", function(markers){
+    var tbl_body = "";
+    for (var i=0; i < markers.length; ++i) {
+      var last_seen = getEpoch()-markers[i].ts;
+      var tbl_row =  '<td>' + resolveAisType(markers[i].msgid) + '</td>'
+      + '<td>' + markers[i].mmsi + '</td>'
+      + '<td>' + markers[i].name + '</td>'
+      + '<td>' + markers[i].sog + '</td>'
+      + '<td>' + last_seen + '</td>';
+      tbl_body += "<tr>" + tbl_row + "</tr>";
+    }
+    $("#reports tbody").html(tbl_body);
+//          var popup_string = 'MMSI: ' + markers[i].mmsi
+//            + '<br>Name: ' + markers[i].name
+//            + '<br>Speed: ' + markers[i].sog + 'kn'
+//            + '<br>Last seen: ' + last_seen + ' seconds ago';
+//        }
+//        else {
+//          var popup_string = 'MMSI: ' + markers[i].mmsi
+//            + '<br>Name: ' + markers[i].name
+//            + '<br>Last seen: ' + last_seen + ' seconds ago';
+//        }
+  });
+  setTimeout(draw_table, 5000);
 }
 

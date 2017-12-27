@@ -19,6 +19,7 @@
 </head>
 <body>
 <div class="container-fluid">
+ <div class="row top-buffer"></div>
  <div class="row">
   <div class="col-md-8">
    <div id="mapid">
@@ -39,7 +40,13 @@ update_positions();
    </div>
   </div>
   <div class="col-md-4">
-   test
+   <table id="reports" class="table table-bordered table-condensed table-striped">
+    <thead>
+     <tr><th>Type</th><th>MMSI</th><th>Name</th><th>Speed</th><th>Last seen</th></tr>
+    <tbody>
+     <script>draw_table();</script>
+    </tbody>
+   </table>
   </div>
  </div>
 </div>
