@@ -2,10 +2,21 @@ import ais.stream
 import socket
 import time
 import json
+import ConfigParser
 from cStringIO import StringIO
 
-UDP_IP_ADDRESS = "80.93.27.40"
-UDP_PORT_NO = 10110
+config = ConfigParser.RawConfigParser()
+config.read('udp-server.conf')
+
+if config.has_option('network', 'listen'):
+    UDP_IP_ADDRESS = config.get('network', 'listen')
+else:
+    UDP_IP_ADDRESS = "127.0.0.1"
+
+if config.has_option('network', 'port'):
+    UDP_PORT_NO = config.getint('network', 'port')
+else:
+    UDP_PORT_NO = 10110  
 
 serverSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 

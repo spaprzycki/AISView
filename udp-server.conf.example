@@ -1,4 +1,4 @@
-[NETWORK]
-UDP_IP_ADDRESS = "80.93.27.40"
-UDP_PORT_NO = 10110
+[network]
+listen = 0.0.0.0
+port = 10110
 
