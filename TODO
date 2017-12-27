@@ -1,0 +1,13 @@
+* add to github!
+DONE * fix last seen timestamp to date mapping
+* store all recorded positions in database
+* draw ship track on click - pull data from db
+* custom icons for various aton types
+* wrap in bootstrap
+* add table with data from json
+* better quality of ship icon
+* investigate plotting range
+* add receiver location marker (from config?)
+* add client location marker (use browser locations?)
+* attempt to decode multi-sentence messages
+* check how unusable it becomes with lots more data/frequency

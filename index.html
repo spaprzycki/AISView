@@ -1,0 +1,99 @@
+<html>
+<head>
+ <title>Newtownmountkennedy AIS receiver</title>
+ <link rel="stylesheet" href="style.css">
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+   integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+   crossorigin=""/>
+ <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+   integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+   crossorigin=""></script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ <script src="leaflet.rotatedMarker.js"></script>
+</head>
+<body>
+ <div id="mapid">
+<script>
+var mymap = L.map('mapid').setView([53.085, -5.71], 9);
+L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+		'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ',
+  subdomains: ['a','b','c']
+}).addTo(mymap);
+
+function getEpoch() {
+  d = new Date();
+  return Math.round(d.getTime() / 1000);
+}
+
+var pins = [];
+var timeout_tracker = [];
+
+function update_positions() {
+  var icon_green_dot_8px = L.icon({
+    iconUrl: 'images/green_dot_8.png',
+    iconSize: [8, 8]
+    //	  iconAnchor: [9, 21],
+    //	  popupAnchor: [0, -14]
+  })
+  var ship_orange = L.icon({
+    iconUrl: 'images/ship_orange_24.png',
+    iconSize: [12, 24],
+  })
+  $.getJSON("markers.json", function(markers){
+    for (var i=0; i < markers.length; ++i) {
+      var last_seen = getEpoch()-markers[i].ts;
+//      console.log(pins[markers[i].mmsi]);
+      if (markers[i].mmsi in pins) {
+        pins[markers[i].mmsi].setRotationAngle(markers[i].dir);
+        pins[markers[i].mmsi].setLatLng([markers[i].lat, markers[i].lng]).update();
+        if (markers[i].msgid == 1) {
+          var popup_string = 'MMSI: ' + markers[i].mmsi
+            + '<br>Name: ' + markers[i].name
+            + '<br>Speed: ' + markers[i].sog + 'kn'
+            + '<br>Last seen: ' + last_seen + ' seconds ago';
+        }
+        else {
+          var popup_string = 'MMSI: ' + markers[i].mmsi
+            + '<br>Name: ' + markers[i].name
+            + '<br>Last seen: ' + last_seen + ' seconds ago';
+        }
+        pins[markers[i].mmsi]._popup.setContent(popup_string).update();
+        timeout_tracker[markers[i].mmsi] = getEpoch();
+      }
+      else {
+        if (markers[i].msgid == 1) {
+          pins[markers[i].mmsi] = L.marker([markers[i].lat, markers[i].lng], {icon: ship_orange, rotationAngle: markers[i].dir})
+          .bindPopup('MMSI: ' + markers[i].mmsi
+            + '<br>Name: ' + markers[i].name
+            + '<br>Speed: ' + markers[i].sog + 'kn'
+            + '<br>Last seen: ' + last_seen + ' seconds ago')
+          .addTo(mymap);
+          timeout_tracker[markers[i].mmsi] = getEpoch();
+        }
+        else {
+          pins[markers[i].mmsi] = L.marker([markers[i].lat, markers[i].lng], {icon: icon_green_dot_8px})
+          .bindPopup('MMSI: ' + markers[i].mmsi
+            + '<br>Name: '
+            + markers[i].name
+            + '<br>Last seen: ' + last_seen + ' seconds ago')
+         .addTo(mymap);
+          timeout_tracker[markers[i].mmsi] = getEpoch();
+        }
+      }
+    }
+    for (var k in timeout_tracker) {
+//      console.log(timeout_tracker[k]);
+      if (timeout_tracker[k] < getEpoch()-300) {
+        mymap.removeLayer(pins[k]);
+      }
+    }
+  });
+  setTimeout(update_positions, 5000);
+}
+update_positions();
+</script>
+</div>
+</body>
+</html>
