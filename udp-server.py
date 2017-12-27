@@ -48,7 +48,7 @@ while True:
 	for i in ships:
 #		print ships[i]['ts']
 		output.append(ships[i])
-		if ships[i]['ts'] < int(time.time())-600:
+		if ships[i]['ts'] < int(time.time())-300:
 			output.remove(ships[i])
 	f = open('markers.json','w')
 	f.write(json.dumps(output, indent=4, sort_keys=True))
