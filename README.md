@@ -5,7 +5,7 @@ AISView is an attempt to create web UI for AIS receiver, similar to the one buil
 This software implements small UDP server that listens on chosen port for raw NMEA messages (AIVDM). [libais](https://github.com/schwehr/libais) is therefore needed to decode messages and provide data in JSON format to web frontend.
 
 ## Dependencies (included here or used from CDN)
-* [Leaflet](http://leafletjs.com/) - JS library for maps.
+* [Leaflet](http://leafletjs.com/)
 > an open-source JavaScript library for mobile-friendly interactive maps.
 * [Openstreetmap](https://www.openstreetmap.org/)
 > OpenStreetMap is a map of the world, created by people like you and free to use under an open licence.
