@@ -1,10 +1,7 @@
-#import ais
-#import ais.stream
 import socket
 import time
 import json
 import ConfigParser
-#from cStringIO import StringIO
 from libaisview import decode_ais
 
 config = ConfigParser.RawConfigParser()
@@ -24,7 +21,6 @@ serverSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 serverSock.bind((UDP_IP_ADDRESS, UDP_PORT_NO))
 
-# https://github.com/asmaloney/Leaflet_Example/blob/master/maps/leaf-demo.js
 entry = {}
 ships = {}
 
