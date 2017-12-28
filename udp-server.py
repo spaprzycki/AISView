@@ -30,9 +30,9 @@ while True:
     data, addr = serverSock.recvfrom(1024)
     raw = data.strip()
     f = StringIO(raw)
-#    print raw
+    print "%s - %s" % (time.strftime("%H:%M:%S"), raw)
     for msg in ais.stream.decode(f):
-	print msg
+	print "%s - %s" % (time.strftime("%H:%M:%S"), msg)
 	entry = { 'mmsi': msg['mmsi'], 'msgid': msg['id'], 'lat': "%.4f"%msg['y'], 'lng': "%.4f"%msg['x'], 'ts': int(time.time()) }
 	if 'name' in msg:
 		entry['name'] = msg['name']
