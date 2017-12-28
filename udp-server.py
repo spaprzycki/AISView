@@ -62,6 +62,8 @@ while True:
                            'name': msg['name'],
                            'aton_type': msg['aton_type']
                          }
+  else:
+    log.write("%s - Unknown Message Type - %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg))
   output = list()
   for i in ships:
     output.append(ships[i])
