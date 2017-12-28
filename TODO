@@ -9,6 +9,6 @@ DONE * add table with data from json
 * investigate plotting range
 * add receiver location marker (from config?)
 * add client location marker (use browser locations?)
-* attempt to decode multi-sentence messages
+DONE * attempt to decode multi-sentence messages
 * check how unusable it becomes with lots more data/frequency
 * rewrite udp-server.py as proper daemon & implement proper logging & debugging

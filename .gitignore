@@ -1,2 +1,4 @@
 *.conf
+*.log
+*.pyc
 markers.json

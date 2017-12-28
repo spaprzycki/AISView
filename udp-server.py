@@ -1,9 +1,11 @@
-import ais.stream
+#import ais
+#import ais.stream
 import socket
 import time
 import json
 import ConfigParser
-from cStringIO import StringIO
+#from cStringIO import StringIO
+from libaisview import decode_ais
 
 config = ConfigParser.RawConfigParser()
 config.read('udp-server.conf')
@@ -26,32 +28,53 @@ serverSock.bind((UDP_IP_ADDRESS, UDP_PORT_NO))
 entry = {}
 ships = {}
 
+log = open('aisview-%s.log'%time.strftime("%Y%m%d-%H%M%S"),'w')
 while True:
-    data, addr = serverSock.recvfrom(1024)
-    raw = data.strip()
-    f = StringIO(raw)
-    print "%s - %s" % (time.strftime("%H:%M:%S"), raw)
-    for msg in ais.stream.decode(f):
-	print "%s - %s" % (time.strftime("%H:%M:%S"), msg)
-	entry = { 'mmsi': msg['mmsi'], 'msgid': msg['id'], 'lat': "%.4f"%msg['y'], 'lng': "%.4f"%msg['x'], 'ts': int(time.time()) }
-	if 'name' in msg:
-		entry['name'] = msg['name']
-	if 'aton_type' in msg:
-		entry['aton_type'] = msg['aton_type']
-	if 'true_heading' in msg:
-		entry['dir'] = msg['true_heading']
-	if 'sog' in msg:
-		entry['sog'] = "%.1f"%msg['sog']
-	ships[msg['mmsi']] = entry
-#	print ships
-	output = list()
-	for i in ships:
-#		print ships[i]['ts']
-		output.append(ships[i])
-		if ships[i]['ts'] < int(time.time())-300:
-			output.remove(ships[i])
-	f = open('markers.json','w')
-	f.write(json.dumps(output, indent=4, sort_keys=True))
+  data, addr = serverSock.recvfrom(1024)
+  raw = data.strip()
+  raw_list = raw.split('\n')
+  log.write("%s - %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), raw_list))
+  msg = decode_ais(raw_list)
+  log.write("%s - %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg))
+  if msg['id'] == 1:
+    ships[msg['mmsi']] = { 'ts': int(time.time()),
+                           'mmsi': msg['mmsi'],
+                           'msgid': msg['id'],
+                           'lat': "%.4f"%msg['y'],
+                           'lng': "%.4f"%msg['x'],
+                           'dir': msg['true_heading'],
+                           'sog': "%.1f"%msg['sog']
+                         }
+  elif msg['id'] == 4:
+    ships[msg['mmsi']] = { 'ts': int(time.time()), 
+                           'mmsi': msg['mmsi'],
+                           'msgid': msg['id'],
+                           'lat': "%.4f"%msg['y'],
+                           'lng': "%.4f"%msg['x']
+                         }
+  elif msg['id'] == 5:
+    ships[msg['mmsi']].update({ 'name': msg['name'],
+                                'dst': msg['destination'],
+                                'callsign': msg['callsign']
+                              })
+  elif msg['id'] == 21:
+    ships[msg['mmsi']] = { 'ts': int(time.time()),
+                           'mmsi': msg['mmsi'],
+                           'msgid': msg['id'],
+                           'lat': "%.4f"%msg['y'],
+                           'lng': "%.4f"%msg['x'],
+                           'name': msg['name'],
+                           'aton_type': msg['aton_type']
+                         }
+  output = list()
+  for i in ships:
+    output.append(ships[i])
+    if ships[i]['ts'] < int(time.time())-300:
+      output.remove(ships[i])
+  f = open('markers.json','w')
+  f.write(json.dumps(output, indent=4, sort_keys=True))
 # mysql> insert into position (id, mmsi, type, lat, lon, ts, name, aton_type) values (NULL, 992501303, 21, '52.7745', '-5.9517', 1514416112, 'ARKLOW TURBINE 1', 3);
-	f.close()
+  f.close()
 #	print json.dumps(output, indent=4, sort_keys=True)
+  log.flush()
+log.close()
