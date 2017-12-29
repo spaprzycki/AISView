@@ -21,6 +21,6 @@ def decode_ais(message):
   try:
     return ais.decode(sentence, fill)
   except Exception as e:
-    return {unicode('error'): unicode(str(e))}
+    return {unicode('id'): long(999), unicode('error'): unicode(str(e))}
 
 #print decode_ais(message)
