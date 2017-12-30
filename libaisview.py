@@ -1,5 +1,6 @@
 import ais
 import MySQLdb
+from math import sin, cos, sqrt, atan2, radians
 
 #message = ['!AIVDM,2,1,0,B,53`fLaD2<gtq09MV221`Ti@8u8N222222222221?=0>;44B60ARkjjkk,0*1E\r', '!AIVDM,2,2,0,B,0H8888888888880,2*5F']
 #message = ['!AIVDM,1,1,,A,13`kDCP01WwUGKlNBGPW0Eh`8@=A,0*59']
@@ -52,14 +53,15 @@ def aisVesselInfoInsert(message, db_host, db_user, db_pass, db_name):
   db = MySQLdb.connect(db_host, db_user, db_pass, db_name)
   cursor = db.cursor()
   sql = "INSERT INTO vessel \
-         (mmsi, name, callsign) \
-         VALUES (%s, %s, %s) \
+         (mmsi, name, callsign, type, updated) \
+         VALUES (%s, %s, %s, %s, now()) \
          ON DUPLICATE KEY UPDATE \
-         name = %s, callsign = %s"
+         name = %s, callsign = %s, type = %s, updated = now()"
   try:
     cursor.execute(sql, (message['mmsi'], message['name'].rstrip(' @'),
-                   message['callsign'].rstrip(' @'), message['name'].rstrip(' @'),
-                   message['callsign'].rstrip(' @')))
+                   message['callsign'].rstrip(' @'), message['type'],
+                   message['name'].rstrip(' @'),
+                   message['callsign'].rstrip(' @'), message['type']))
     db.commit()
     db.close()
     return True
@@ -83,4 +85,27 @@ def aisVesselInfoFetch(message, db_host, db_user, db_pass, db_name):
   except Exception as e:
     db.close()
     return str(e)
+
+def geoDistance(coord1, coord2, unit='NM'):
+# 
+# coord1, coord2 must be dict in following format:
+# coord1 = {'lat': 52.1234, 'lng': -6.1234 }
+#
+  conversion = {'m': 1, 'NM': 1852, 'km': 1000, 'mi': 1609.344}
+  if unit in conversion:
+    r = 6371000 / conversion[unit]
+  else:
+    r = 6371000
+  try:
+    lat1 = radians(float(coord1['lat']))
+    lat2 = radians(float(coord2['lat']))
+    lng1 = radians(float(coord1['lng']))
+    lng2 = radians(float(coord2['lng']))
+    dlat = lat2 - lat1
+    dlng = lng2 - lng1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlng / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return (r * c)
+  except:
+    return -1
 

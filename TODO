@@ -1,7 +1,8 @@
 DONE * add to github!
 DONE * fix last seen timestamp to date mapping
 DONE * store all recorded positions in database
-* draw ship track on click - pull data from db
+DONE * Ajax call to get ship positions - python cgi
+DONE * draw ship track on click - pull data from db (on click in table for now)
 * custom icons for various aton types
 DONE * wrap in bootstrap
 DONE * add table with data from json
@@ -13,3 +14,4 @@ DONE * attempt to decode multi-sentence messages
 * check how unusable it becomes with lots more data/frequency
 * rewrite udp-server.py as proper daemon & implement proper logging & debugging
 DONE * handle type 5 messages and cache vessels details in sql
+DONE * calculate distance from receiver

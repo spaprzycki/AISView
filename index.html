@@ -21,10 +21,10 @@
 <div class="container-fluid">
  <div class="row top-buffer"></div>
  <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-8 main">
    <div id="mapid">
 <script>
-var mymap = L.map('mapid').setView([53.085, -5.71], 9);
+mymap = L.map('mapid').setView([53.085, -5.71], 9);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 18,
   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -32,21 +32,30 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   subdomains: ['a','b','c']
 }).addTo(mymap);
 
-var pins = [];
-var timeout_tracker = [];
+pins = [];
+timeout_tracker = [];
+line = [];
+linemarks = [];
 
 update_positions();
 </script>
    </div>
   </div>
   <div class="col-md-4">
-   <table id="reports" class="table table-bordered table-condensed table-striped">
-    <thead>
-     <tr><th>Type</th><th>MMSI</th><th>Name</th><th>Speed</th><th>Last seen</th></tr>
-    <tbody>
-     <script>draw_table();</script>
-    </tbody>
-   </table>
+   <div class="row">
+    <div class="col-md-12">
+     <table id="reports" class="table table-bordered table-condensed table-striped">
+      <thead>
+       <tr><th>Type</th><th>MMSI</th><th>Name</th><th>Speed</th><th>Distance</th><th>Last seen</th></tr>
+      <tbody>
+       <script>draw_table();</script>
+      </tbody>
+     </table>
+    </div>
+   </div>
+   <div class="row">
+    <div id="testdiv" class="col-md-12"></div>
+   </div>
   </div>
  </div>
 </div>

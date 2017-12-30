@@ -1,5 +1,5 @@
 function resolveAisType(id) {
-  var types = { 1 : "Vessel", 4 : "Base station", 21 : "AtoN" };
+  var types = { 1 : "Vessel", 3 : "Vessel", 4 : "Base station", 21 : "AtoN" };
   if (id in types) {
     return types[id];
   }
@@ -31,7 +31,7 @@ function update_positions() {
       if (markers[i].mmsi in pins) {
         pins[markers[i].mmsi].setRotationAngle(markers[i].dir);
         pins[markers[i].mmsi].setLatLng([markers[i].lat, markers[i].lng]).update();
-        if (markers[i].msgid == 1) {
+        if (markers[i].msgid == 1 || markers[i].msgid == 3) {
           var popup_string = 'MMSI: ' + markers[i].mmsi
             + '<br>Name: ' + markers[i].name
             + '<br>Speed: ' + markers[i].sog + 'kn'
@@ -46,7 +46,7 @@ function update_positions() {
         timeout_tracker[markers[i].mmsi] = getEpoch();
       }
       else {
-        if (markers[i].msgid == 1) {
+        if (markers[i].msgid == 1 || markers[i].msgid == 3) {
           pins[markers[i].mmsi] = L.marker([markers[i].lat, markers[i].lng], {icon: ship_orange, rotationAngle: markers[i].dir})
           .bindPopup('MMSI: ' + markers[i].mmsi
             + '<br>Name: ' + markers[i].name
@@ -91,24 +91,49 @@ function draw_table() {
         name = "Unknown";
       }
       var tbl_row =  '<td>' + resolveAisType(markers[i].msgid) + '</td>'
-      + '<td>' + markers[i].mmsi + '</td>'
+      + '<td><a href="javascript:getPositions(' + markers[i].mmsi + ')">' + markers[i].mmsi + '</a></td>'
       + '<td>' + name + '</td>'
       + '<td>' + markers[i].sog + '</td>'
+      + '<td>' + markers[i].dist + '</td>'
       + '<td>' + last_seen + '</td>';
       tbl_body += "<tr>" + tbl_row + "</tr>";
     }
     $("#reports tbody").html(tbl_body);
-//          var popup_string = 'MMSI: ' + markers[i].mmsi
-//            + '<br>Name: ' + markers[i].name
-//            + '<br>Speed: ' + markers[i].sog + 'kn'
-//            + '<br>Last seen: ' + last_seen + ' seconds ago';
-//        }
-//        else {
-//          var popup_string = 'MMSI: ' + markers[i].mmsi
-//            + '<br>Name: ' + markers[i].name
-//            + '<br>Last seen: ' + last_seen + ' seconds ago';
-//        }
   });
-  setTimeout(draw_table, 5000);
+  setTimeout(draw_table, 30000);
+}
+
+function getPositions(mmsi) {
+  var tri = L.icon({
+    iconUrl: 'images/tri_8.png',
+    iconSize: [8, 8],
+  })
+  if (typeof(line[0]) != 'undefined') {
+    mymap.removeLayer(line[0]);
+    for (var i=0; i < linemarks.length; ++i) {
+      mymap.removeLayer(linemarks[i]);
+    }
+  }
+  $.getJSON("cgi-bin/getPositions.cgi?mmsi=" + mmsi, function(positions){
+    var linepoint = []
+    for (var i=0; i < positions.length; ++i) {
+      var point = new L.LatLng(positions[i].lat, positions[i].lng);
+      linepoint.push(point);
+//      var mark = new L.marker([positions[i].lat, positions[i].lng], {icon: tri, rotationAngle: positions[i].dir});
+//      linemarks.push(mark);
+    }
+//    for (var i=0; i < linemarks.length; ++i) {
+//      linemarks[i].addTo(mymap);
+//    }
+    line[0] = new L.Polyline(linepoint, {
+    color: 'red',
+    weight: 2,
+    opacity: 0.5,
+    smoothFactor: 1
+    });
+    line[0].addTo(mymap);
+//    document.getElementById('testdiv').innerHTML = "";
+//    $("#testdiv").html(out);
+  });
 }
 

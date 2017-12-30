@@ -4,6 +4,9 @@
 .top-buffer {
  margin-top:20px;
 }
+div.main {
+ padding: 1px;
+}
 table {
- font-size: 11px;
+ font-size: 9px;
 }
