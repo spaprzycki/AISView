@@ -34,13 +34,14 @@ def aisVesselPositionInsert(message, db_host, db_user, db_pass, db_name):
   if 'dst' not in message:
     message['dst'] = ''
   sql = "INSERT INTO position \
-         (id, mmsi, lat, lng, ts, dir, sog, dst) \
-         VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)"
+         (id, mmsi, lat, lng, ts, dir, sog, nav_status, dst) \
+         VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s)"
   try:
     cursor.execute(sql, (message['mmsi'], message['lat'],
                    message['lng'], message['ts'],
                    message['dir'], message['sog'],
-                   message['dst']))
+                   message['nav_status'], 
+                   message['dst'].rstrip(' @')))
     db.commit()
     db.close()
     return True

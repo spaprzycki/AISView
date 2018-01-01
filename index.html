@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
  <link rel="stylesheet" href="style.css">
+ <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
    integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
    crossorigin=""/>
@@ -44,9 +45,10 @@ update_positions();
   <div class="col-md-4">
    <div class="row">
     <div class="col-md-12">
+     <p class="clear-map text-right"><a href="javascript:getPositions(0); getVesselDetails(0)">clear selection</a></p>
      <table id="reports" class="table table-bordered table-condensed table-striped">
       <thead>
-       <tr><th>Type</th><th>MMSI</th><th>Name</th><th>Speed</th><th>Distance</th><th>Last seen</th></tr>
+       <tr><th>Type</th><th>MMSI</th><th>Name</th><th>Speed<br>[kn]</th><th>Distance<br>[NM]</th><th>Last seen<br>[seconds]</th></tr>
       <tbody>
        <script>draw_table();</script>
       </tbody>
@@ -54,7 +56,11 @@ update_positions();
     </div>
    </div>
    <div class="row">
-    <div id="testdiv" class="col-md-12"></div>
+    <div class="col-md-12">
+     <table id="vesseldetails" class="table table-bordered table-condensed table-striped">
+      <tbody></tbody>
+     </table>
+    </div>
    </div>
   </div>
  </div>

@@ -8,5 +8,12 @@ div.main {
  padding: 1px;
 }
 table {
- font-size: 9px;
+ font-size: 10px;
+}
+p.clear-map {
+ font-size: 10px;
+}
+#reports th {
+ text-align: center;
+ vertical-align: middle;
 }

@@ -47,6 +47,7 @@ while True:
                                   'lat': "%.4f"%msg['y'],
                                   'lng': "%.4f"%msg['x'],
                                   'dir': msg['true_heading'],
+                                  'nav_status': msg['nav_status'],
                                   'sog': "%.1f"%msg['sog']
                                 })
     else:
@@ -56,6 +57,7 @@ while True:
                              'lat': "%.4f"%msg['y'],
                              'lng': "%.4f"%msg['x'],
                              'dir': msg['true_heading'],
+                             'nav_status': msg['nav_status'],
                              'sog': "%.1f"%msg['sog']
                            }
     log.write("%s [T%s decoded] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg['id'], msg))
@@ -87,20 +89,23 @@ while True:
 #    log.write("%s [T%s extract] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), ships[msg['mmsi']]['msgid'], ships[msg['mmsi']]))
   # Type 5 - ship voyage & static data reports
   elif msg['id'] == 5:
-    ships[msg['mmsi']].update({ 'ts': int(time.time()),
-                                'name': msg['name'],
-                                'dst': msg['destination'],
-                                'callsign': msg['callsign'],
-                                'type': msg['type_and_cargo']
-                              })
-    log.write("%s [T%s decoded] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg['id'], msg))
-    log.write("%s [T%s extract] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), ships[msg['mmsi']]['msgid'], ships[msg['mmsi']]))
+    try:
+      ships[msg['mmsi']].update({ 'ts': int(time.time()),
+                                  'name': msg['name'],
+                                  'dst': msg['destination'],
+                                  'callsign': msg['callsign'],
+                                  'type': msg['type_and_cargo']
+                                })
+      log.write("%s [T%s decoded] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg['id'], msg))
+      log.write("%s [T%s extract] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), ships[msg['mmsi']]['msgid'], ships[msg['mmsi']]))
+      aisVesselInfoInsert(ships[msg['mmsi']],
+                      config.get('db', 'db_host'),
+                      config.get('db', 'db_user'),
+                      config.get('db', 'db_pass'),
+                      config.get('db', 'db_name'))
+    except Exception as e:
+      log.write("%s %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), e))
 #    try: 
-    aisVesselInfoInsert(ships[msg['mmsi']],
-                    config.get('db', 'db_host'),
-                    config.get('db', 'db_user'),
-                    config.get('db', 'db_pass'),
-                    config.get('db', 'db_name'))
 #    except Exception as e:
 #      log.write("%s - %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), 'Error inserting vessel to DB'))
   # Type 21 - AtoN reports
@@ -117,9 +122,12 @@ while True:
       ships[msg['mmsi']].update({ 'dist': "%.2f"%geoDistance(receiver, ships[msg['mmsi']]) })
     log.write("%s [T%s decoded] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg['id'], msg))
     log.write("%s [T%s extract] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), ships[msg['mmsi']]['msgid'], ships[msg['mmsi']]))
-
+  elif msg['id'] == 999:
+    log.write("%s - Decoding error - %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg))
+    continue
   else:
     log.write("%s - Unknown Message Type - %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg))
+    continue
   output = list()
   for i in ships:
     output.append(ships[i])

@@ -76,7 +76,7 @@ function update_positions() {
       }
     }
   });
-  setTimeout(update_positions, 5000);
+  setTimeout(update_positions, 10000);
 }
 
 function draw_table() {
@@ -90,9 +90,14 @@ function draw_table() {
       else {
         name = "Unknown";
       }
-      var tbl_row =  '<td>' + resolveAisType(markers[i].msgid) + '</td>'
-      + '<td><a href="javascript:getPositions(' + markers[i].mmsi + ')">' + markers[i].mmsi + '</a></td>'
-      + '<td>' + name + '</td>'
+      var tbl_row =  '<td>' + resolveAisType(markers[i].msgid) + '</td>';
+      if (markers[i].msgid == 1 || markers[i].msgid == 3) {
+        tbl_row += '<td><a href="javascript:getPositions(' + markers[i].mmsi + '); getVesselDetails(' + markers[i].mmsi + ')">' + markers[i].mmsi + '</a></td>';
+      }
+      else {
+        tbl_row += '<td>' + markers[i].mmsi + '</td>';
+      }
+      tbl_row += '<td>' + name + '</td>'
       + '<td>' + markers[i].sog + '</td>'
       + '<td>' + markers[i].dist + '</td>'
       + '<td>' + last_seen + '</td>';
@@ -100,7 +105,7 @@ function draw_table() {
     }
     $("#reports tbody").html(tbl_body);
   });
-  setTimeout(draw_table, 30000);
+  setTimeout(draw_table, 10000);
 }
 
 function getPositions(mmsi) {
@@ -137,3 +142,33 @@ function getPositions(mmsi) {
   });
 }
 
+function getVesselDetails(mmsi) {
+  $("#vesseldetails tbody").html("");
+  $.getJSON("cgi-bin/getVesselDetails.cgi?mmsi=" + mmsi, function(details){
+    for (var i=0; i < details.length; ++i) {
+      var last_seen = getEpoch()-details[i].ts;
+      var tbl_body = '<tr><th colspan="2" class="text-center">Details for ' + details[i].name + ':</th></tr>'
+      tbl_body += '<tr><td>Vessel MMSI:</td><td>' + details[i].mmsi + '</td></tr>';
+      tbl_body += '<tr><td>Vessel Name:</td><td>' + details[i].name + '</td></tr>';
+      tbl_body += '<tr><td>Vessel Type:</td><td>' + details[i].type_desc + '</td></tr>';
+      tbl_body += '<tr><td>Vessel Callsign:</td><td>' + details[i].callsign + '</td></tr>';
+      tbl_body += '<tr><td>Last recorded speed:</td><td>' + details[i].sog + ' knots</td></tr>';
+      tbl_body += '<tr><td>Last recorded status:</td><td>' + details[i].nav_status_desc + '</td></tr>';
+      tbl_body += '<tr><td>Last recorded destination:</td><td>' + details[i].dst + '</td></tr>';
+      tbl_body += '<tr><td>Last recorded position:</td><td>' + details[i].lat + ', ' + details[i].lng + '</td></tr>';
+      tbl_body += '<tr><td>Last seen:</td><td>' + last_seen + ' seconds ago</td></tr>';
+    }
+    $("#vesseldetails tbody").html(tbl_body);
+  });
+}
+//MMSI
+//Vessel Name
+//Vessel Type
+//Callsign
+//Size - not yet
+//Draught - not yet
+//Last seen speed
+//Last seen status
+//Last seen destination
+//Last seen position
+//Last seen
