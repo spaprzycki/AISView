@@ -12,6 +12,26 @@ function getEpoch() {
   d = new Date();
   return Math.round(d.getTime() / 1000);
 }
+function plotRange(ts = 14400) {
+  var dot_8px = L.icon({
+    iconUrl: 'images/green_dot_8.png',
+    iconSize: [8, 8]
+  })
+  $.getJSON("cgi-bin/getRange.cgi?time=" + ts, function(positions){
+//    var linepoint = []
+    var range = []
+    for (var i=0; i < positions.length; ++i) {
+          range[positions[i].id] = L.marker([positions[i].lat, positions[i].lng], {icon: dot_8px})
+          .bindPopup('Lat: ' + positions[i].lat
+            + '<br>Lng: ' + positions[i].lng
+            + '<br>Distance: ' + positions[i].distance
+            + '<br>Bearing: ' + positions[i].bearing)
+          .addTo(mymap);
+    }
+  });
+}
+
+      
 
 function update_positions() {
   var icon_green_dot_8px = L.icon({
@@ -24,6 +44,11 @@ function update_positions() {
     iconUrl: 'images/ship_orange_24.png',
     iconSize: [12, 24],
   })
+  var helicopter = L.icon({
+    iconUrl: 'images/helicopter_16.png',
+    iconSize: [16, 16],
+  })
+
   $.getJSON("markers.json", function(markers){
     for (var i=0; i < markers.length; ++i) {
       var last_seen = getEpoch()-markers[i].ts;
