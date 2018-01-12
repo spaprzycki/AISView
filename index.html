@@ -39,13 +39,20 @@ line = [];
 linemarks = [];
 
 update_positions();
+getMessageRate();
 </script>
    </div>
   </div>
   <div class="col-md-4">
    <div class="row">
     <div class="col-md-12">
-     <p class="clear-map text-right"><a href="javascript:plotRange()">show range</a> | <a href="javascript:getPositions(0); getVesselDetails(0)">clear selection</a></p>
+     <p class="clear-map text-right">
+      <a href="javascript:plotRange()">show range</a> |
+      <a href="javascript:getPositions(0); getVesselDetails(0)">clear selection</a>
+     </p>
+     <p class="clear-map text-right">
+      Messages: <span id="msgrate"></span> / min
+     </p>
      <table id="reports" class="table table-bordered table-condensed table-striped">
       <thead>
        <tr><th>Type</th><th>MMSI</th><th>Name</th><th>Speed<br>[kn]</th><th>Distance<br>[NM]</th><th>Last seen<br>[seconds]</th></tr>

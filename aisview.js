@@ -8,6 +8,22 @@ function resolveAisType(id) {
   }
 }
 
+function pickShipIcon(type) {
+  if (type == 30)
+    icon = 'orange';
+  else if (type >= 40 && type < 50)
+    icon = 'yellow';
+  else if (type >= 60 && type < 70)
+    icon = 'blue';
+  else if (type >= 70 && type < 80)
+    icon = 'green';
+  else if (type >= 80 && type < 90)
+    icon = 'red';
+  else
+    icon = 'grey';
+  return icon;
+}
+
 function getEpoch() {
   d = new Date();
   return Math.round(d.getTime() / 1000);
@@ -34,6 +50,26 @@ function plotRange(ts = 14400) {
       
 
 function update_positions() {
+  var shipIcon = { 'orange': L.icon({
+                   iconUrl: 'images/ship_orange.png',
+                   iconSize: [12, 24]}),
+                   'yellow': L.icon({
+                   iconUrl: 'images/ship_yellow.png',
+                   iconSize: [12, 24]}),
+                   'blue': L.icon({
+                   iconUrl: 'images/ship_blue.png',
+                   iconSize: [12, 24]}),
+                   'green': L.icon({
+                   iconUrl: 'images/ship_green.png',
+                   iconSize: [12, 24]}),
+                   'red': L.icon({
+                   iconUrl: 'images/ship_red.png',
+                   iconSize: [12, 24]}),
+                   'grey': L.icon({
+                   iconUrl: 'images/ship_grey.png',
+                   iconAnchor: [6, 12],
+                   iconSize: [12, 24]})
+                 }
   var icon_green_dot_8px = L.icon({
     iconUrl: 'images/green_dot_8.png',
     iconSize: [8, 8]
@@ -50,6 +86,7 @@ function update_positions() {
   })
 
   $.getJSON("markers.json", function(markers){
+//  $.getJSON("cgi-bin/getData.cgi", function(markers){
     for (var i=0; i < markers.length; ++i) {
       var last_seen = getEpoch()-markers[i].ts;
 //      console.log(pins[markers[i].mmsi]);
@@ -72,11 +109,18 @@ function update_positions() {
       }
       else {
         if (markers[i].msgid == 1 || markers[i].msgid == 3) {
-          pins[markers[i].mmsi] = L.marker([markers[i].lat, markers[i].lng], {icon: ship_orange, rotationAngle: markers[i].dir})
+          pins[markers[i].mmsi] = L.marker([markers[i].lat, markers[i].lng], {icon: shipIcon[pickShipIcon(markers[i].type)], rotationAngle: markers[i].dir, mmsi: markers[i].mmsi})
           .bindPopup('MMSI: ' + markers[i].mmsi
             + '<br>Name: ' + markers[i].name
             + '<br>Speed: ' + markers[i].sog + 'kn'
             + '<br>Last seen: ' + last_seen + ' seconds ago')
+          .on('click', onMarkerClick)
+          .on('mouseover', function (e) {
+            this.openPopup();
+          })
+          .on('mouseout', function (e) {
+            this.closePopup();
+          })
           .addTo(mymap);
           timeout_tracker[markers[i].mmsi] = getEpoch();
         }
@@ -106,6 +150,7 @@ function update_positions() {
 
 function draw_table() {
   $.getJSON("markers.json", function(markers){
+//  $.getJSON("cgi-bin/getData.cgi", function(markers){
     var tbl_body = "";
     for (var i=0; i < markers.length; ++i) {
       var last_seen = getEpoch()-markers[i].ts;
@@ -167,6 +212,13 @@ function getPositions(mmsi) {
   });
 }
 
+function getMessageRate() {
+  $.getJSON("cgi-bin/getPositions.cgi?mmsi=0", function(positions){
+    $("#msgrate").html(positions[0].count);
+  });
+  setTimeout(getMessageRate, 10000);
+}
+
 function getVesselDetails(mmsi) {
   $("#vesseldetails tbody").html("");
   $.getJSON("cgi-bin/getVesselDetails.cgi?mmsi=" + mmsi, function(details){
@@ -197,3 +249,9 @@ function getVesselDetails(mmsi) {
 //Last seen destination
 //Last seen position
 //Last seen
+
+function onMarkerClick(e) {
+//  console.log(this.options.mmsi);
+  getVesselDetails(this.options.mmsi);
+  getPositions(this.options.mmsi);
+}
