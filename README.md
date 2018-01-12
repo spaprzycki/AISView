@@ -11,3 +11,6 @@ This software implements small UDP server that listens on chosen port for raw NM
 > OpenStreetMap is a map of the world, created by people like you and free to use under an open licence.
 * [Leaflet.RotatedMarker](https://github.com/bbecquet/Leaflet.RotatedMarker)
 > Leaflet plugin to enable the rotation of map marker icons.
+
+![AISView screenshot](images/aisview_20170112.png)
+
