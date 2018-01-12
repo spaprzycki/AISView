@@ -12,5 +12,6 @@ This software implements small UDP server that listens on chosen port for raw NM
 * [Leaflet.RotatedMarker](https://github.com/bbecquet/Leaflet.RotatedMarker)
 > Leaflet plugin to enable the rotation of map marker icons.
 
+## Screenshot (as of 2017/01/12)
 ![AISView screenshot](images/aisview_20170112.png)
 
